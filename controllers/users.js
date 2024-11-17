@@ -20,7 +20,7 @@ router.post('/signup', async(req, res) => {
         const token = jwt.sign(
             {username: user.username, _id: user._id},
             process.env.JWT_SECRET)
-        res.json(user)
+        res.json({user, token})
         
     } catch (error) {
         console.log(error)
@@ -28,13 +28,18 @@ router.post('/signup', async(req, res) => {
 })
 
 router.post('/signin', async(req, res) => {
+    
     try {
         
         const user = await User.findOne({username: req.body.username})
+        console.log(user)
          if(user && bcrypt.compareSync(req.body.password, user.hashedPassword)){
             const token = jwt.sign(
                 {username: user.username, _id: user._id},
                 process.env.JWT_SECRET)
+            res.json({user, token})
+         }else {
+            res.status(400).json({ error: "invalid username or password" })
          }
     } catch (error) {
         console.log(error)
